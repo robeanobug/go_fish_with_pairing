@@ -33,36 +33,38 @@ describe GoFishSocketServer do
   end
 
   it 'sends clients a welcome message' do
-    @clients.push(client1)
-    @server.accept_new_client('Player 1')
-
-    @clients.push(client2)
-    @server.accept_new_client('Player 2')
+    setup_game_with_players
 
     expect(client1.capture_output).to match /welcome/i
     expect(client2.capture_output).to match /welcome/i
   end
 
   it 'outputs game is starting to clients' do
-    @clients.push(client1)
-    @server.accept_new_client('Player 1')
-
-    @clients.push(client2)
-    @server.accept_new_client('Player 2')
-    @server.create_game_if_possible
+    setup_game_with_players
 
     expect(client1.capture_output).to match /game is starting/i
     expect(client2.capture_output).to match /game is starting/i
   end
 
-  it 'creates a game runner room for the players to play the game in' do
+  it 'creates a game to play the game in' do
+    setup_game_with_players
+
+    expect(@server.games.length).to be 1
+  end
+
+  it 'creates a game room' do
+    
+  end
+
+  private
+
+  def setup_game_with_players
     @clients.push(client1)
     @server.accept_new_client('Player 1')
 
     @clients.push(client2)
     @server.accept_new_client('Player 2')
-    @server.create_game_if_possible
 
-    expect(@server.games.length).to be 1
+    @server.create_game_if_possible
   end
 end
