@@ -2,7 +2,7 @@ require 'socket'
 require_relative '../lib/go_fish_socket_server'
 require_relative '../lib/mock_go_fish_socket_client'
 
-describe GoFishSocketServer do
+RSpec.describe GoFishSocketServer do
   before(:each) do
     @clients = []
     @server = GoFishSocketServer.new
@@ -29,6 +29,7 @@ describe GoFishSocketServer do
     player_count = 1
     @clients.push(client1)
     @server.accept_new_client('Player 1')
+
     expect(@server.players.count).to eq(player_count)
   end
 
@@ -52,8 +53,16 @@ describe GoFishSocketServer do
     expect(@server.games.length).to be 1
   end
 
-  it 'creates a game room' do
-    
+  it 'creates a game lobby' do
+    setup_game_with_players
+
+    expect(@server.lobbies.length).to be 1
+  end
+
+  it 'creates a players_clients hash' do
+    setup_game_with_players
+
+    expect(@server.players_clients.values.first).to eq(@server.clients.first)
   end
 
   private

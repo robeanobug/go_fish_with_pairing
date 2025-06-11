@@ -2,18 +2,19 @@ require 'socket'
 require_relative 'go_fish_game'
 
 class GoFishSocketServer
-  attr_accessor :server, :clients, :players, :lobby, :games
+  attr_accessor :server, :clients, :players, :lobbies, :games
   attr_reader :port_number
   def initialize
     @port_number = 3336
     @clients = []
     @players = []
     @games = []
+    @lobbies = []
   end
 
   def accept_new_client(player_name = 'Random Player')
     client = server.accept_nonblock
-    players << player_name
+    players << Player.new(player_name)
     clients << client
     client.puts 'Welcome to Go Fish!'
   rescue IO::WaitReadable, Errno::EINTR
@@ -24,8 +25,13 @@ class GoFishSocketServer
     if players.count > 1
       game = GoFishGame.new(players)
       games << game
+      lobbies << GoFishLobby.new(game, players_clients)
       send_message_to_all_clients('Game is starting...')
     end
+  end
+
+  def players_clients
+    players.zip(clients).to_h
   end
 
   def start
@@ -41,4 +47,5 @@ class GoFishSocketServer
   def send_message_to_all_clients(message)
     clients.each { |client| client.puts message}
   end
+
 end
