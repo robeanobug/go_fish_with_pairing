@@ -5,15 +5,17 @@ class GoFishSocketServer
   attr_reader :port_number
   def initialize
     @port_number = 3336
-    # @games = []
     @clients = []
     @players = []
   end
 
-  def accept_new_client(player_name)
+  def accept_new_client(player_name = 'Random Player')
     client = server.accept_nonblock
     players << player_name
     clients << client
+    client.puts 'Welcome to Go Fish!'
+  rescue IO::WaitReadable, Errno::EINTR
+    puts 'No client to accept'
   end
 
   def start

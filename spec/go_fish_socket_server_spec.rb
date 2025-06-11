@@ -32,7 +32,7 @@ describe GoFishSocketServer do
     expect(@server.players.count).to eq(player_count)
   end
 
-  xit 'sends clients a welcome message' do
+  it 'sends clients a welcome message' do
     @clients.push(client1)
     @server.accept_new_client('Player 1')
 

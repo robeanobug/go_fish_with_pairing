@@ -6,7 +6,7 @@ loop do
   until output != ""
     begin
       sleep(0.1)
-      output = socket.read_nonblock(1000).chomp # not gets which blocks
+      output = socket.read_nonblock(1000).chomp
     rescue IO::WaitReadable
     end
   end
