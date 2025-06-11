@@ -63,6 +63,6 @@ describe GoFishSocketServer do
     @server.accept_new_client('Player 2')
     @server.create_game_if_possible
 
-    expect(client)
+    expect(@server.games.length).to be 1
   end
 end

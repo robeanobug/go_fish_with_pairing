@@ -1,12 +1,14 @@
 require 'socket'
+require_relative 'go_fish_game'
 
 class GoFishSocketServer
-  attr_accessor :server, :clients, :players, :lobby
+  attr_accessor :server, :clients, :players, :lobby, :games
   attr_reader :port_number
   def initialize
     @port_number = 3336
     @clients = []
     @players = []
+    @games = []
   end
 
   def accept_new_client(player_name = 'Random Player')
@@ -20,6 +22,8 @@ class GoFishSocketServer
 
   def create_game_if_possible
     if players.count > 1
+      game = GoFishGame.new(players)
+      games << game
       send_message_to_all_clients('Game is starting...')
     end
   end
