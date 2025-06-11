@@ -42,4 +42,27 @@ describe GoFishSocketServer do
     expect(client1.capture_output).to match /welcome/i
     expect(client2.capture_output).to match /welcome/i
   end
+
+  it 'outputs game is starting to clients' do
+    @clients.push(client1)
+    @server.accept_new_client('Player 1')
+
+    @clients.push(client2)
+    @server.accept_new_client('Player 2')
+    @server.create_game_if_possible
+
+    expect(client1.capture_output).to match /game is starting/i
+    expect(client2.capture_output).to match /game is starting/i
+  end
+
+  it 'creates a game runner room for the players to play the game in' do
+    @clients.push(client1)
+    @server.accept_new_client('Player 1')
+
+    @clients.push(client2)
+    @server.accept_new_client('Player 2')
+    @server.create_game_if_possible
+
+    expect(client)
+  end
 end
