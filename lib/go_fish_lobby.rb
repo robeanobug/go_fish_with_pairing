@@ -3,14 +3,14 @@ require_relative 'go_fish_socket_server'
 
 class GoFishLobby
   attr_reader :game, :players_clients
-  # attr_accessor :opponent
+  attr_accessor :displayed_hand, :requested_card_rank, :rank
   def initialize(game, players_clients)
     @game = game
     @players_clients = players_clients
   end
 
   def play_round
-    display_hands
+    display_hands unless displayed_hand
     get_rank
     display_opponents
     get_opponent
@@ -55,6 +55,7 @@ class GoFishLobby
     clients.each do |client|
       client.puts "Your cards: #{ get_cards(clients_players[client]) } }"
     end
+    self.displayed_hand = true
   end
 
   def get_cards(player)
@@ -62,9 +63,11 @@ class GoFishLobby
   end
 
   def get_rank
-    current_client.puts 'Please request a card rank: '
-    requested_rank = listen_to_current_client
-    current_client.puts "You requested: #{requested_rank}"
+    return rank if rank
+    current_client.puts 'Please request a card rank: ' unless requested_card_rank
+    self.requested_card_rank = true
+    self.rank = listen_to_current_client
+    current_client.puts "You requested: #{rank}" if rank
   end
 
   def listen_to_current_client(delay=0.1)

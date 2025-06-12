@@ -28,17 +28,21 @@ RSpec.describe GoFishLobby do
   let(:lobby) { @server.lobbies.first }
   # let(:game) { @server.games.first }
 
-  it 'outputs every players hand to every player' do
+  it 'outputs every players hand to every player once' do
     lobby.play_round
 
     expect(client1.capture_output).to match /Your cards/i
     expect(client2.capture_output).to match /Your cards/i
+    lobby.play_round
+    expect(client1.capture_output).to_not match /Your cards/i
   end
 
-  it 'requests a card rank from the current player' do
+  it 'requests a card rank from the current player once' do
     lobby.play_round
 
     expect(client1.capture_output).to match /Please request a card rank/i
+    lobby.play_round
+    expect(client1.capture_output).to_not match /Please request a card rank/i
   end
 
   it 'gets a card rank request from the current player' do
