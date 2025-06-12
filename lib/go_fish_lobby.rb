@@ -63,6 +63,15 @@ class GoFishLobby
 
   def get_rank
     current_client.puts 'Please request a card rank: '
+    requested_rank = listen_to_current_client
+    current_client.puts "You requested: #{requested_rank}"
+  end
+
+  def listen_to_current_client(delay=0.1)
+    sleep(delay)
+    current_client.read_nonblock(200_000).chomp
+  rescue IO::WaitReadable
+    nil
   end
 
   def display_opponents

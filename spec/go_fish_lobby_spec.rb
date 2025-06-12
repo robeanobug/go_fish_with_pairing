@@ -35,10 +35,19 @@ RSpec.describe GoFishLobby do
     expect(client2.capture_output).to match /Your cards/i
   end
 
-  it 'gets a card rank request from the current player' do
+  it 'requests a card rank from the current player' do
     lobby.play_round
 
     expect(client1.capture_output).to match /Please request a card rank/i
+  end
+
+  it 'gets a card rank request from the current player' do
+    lobby.play_round
+    client1.provide_input('Ace')
+    lobby.play_round
+
+    expect(client1.capture_output).to match /You requested: Ace/i
+    lobby.play_round
   end
 
   it 'displays the opponents' do
@@ -50,12 +59,12 @@ RSpec.describe GoFishLobby do
   it 'gets a target player from the current player' do
     lobby.play_round
     
-    expect(client1.capture_output). to match /Which opponent would you like to request from:/i
+    expect(client1.capture_output).to match /Which opponent would you like to request from:/i
   end
 
   it 'displays round results to players' do
     lobby.play_round
-    expect(client1.capture_output). to match /result/i
+    expect(client1.capture_output).to match /result/i
   end
 
   private
