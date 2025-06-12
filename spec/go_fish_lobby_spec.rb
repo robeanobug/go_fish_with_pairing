@@ -56,10 +56,12 @@ RSpec.describe GoFishLobby do
 
   end
 
-  it 'displays the opponents' do
+  it 'displays the opponents once' do
     lobby.play_round
 
     expect(client1.capture_output).to match /opponents:/i
+    lobby.play_round
+    expect(client1.capture_output).to_not match /opponents:/i
   end
 
   it 'gets a target player from the current player' do

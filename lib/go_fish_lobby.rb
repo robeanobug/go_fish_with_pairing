@@ -3,7 +3,7 @@ require_relative 'go_fish_socket_server'
 
 class GoFishLobby
   attr_reader :game, :players_clients
-  attr_accessor :displayed_hand, :requested_card_rank, :rank
+  attr_accessor :displayed_hand, :requested_card_rank, :rank, :displayed_opponents
   def initialize(game, players_clients)
     @game = game
     @players_clients = players_clients
@@ -78,7 +78,8 @@ class GoFishLobby
   end
 
   def display_opponents
-    current_client.puts "Your opponents: #{ opponents }"
+    current_client.puts "Your opponents: #{ opponents }" unless displayed_opponents
+    self.displayed_opponents = true
   end
 
   def opponents
