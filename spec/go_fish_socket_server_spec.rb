@@ -59,12 +59,6 @@ RSpec.describe GoFishSocketServer do
     expect(@server.lobbies.length).to be 1
   end
 
-  it 'creates a players_clients hash' do
-    setup_game_with_players
-
-    expect(@server.players_clients.values.first).to eq(@server.clients.first)
-  end
-
   private
 
   def setup_game_with_players

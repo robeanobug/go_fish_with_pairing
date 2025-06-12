@@ -9,6 +9,7 @@ RSpec.describe GoFishLobby do
     @server = GoFishSocketServer.new
     @server.start
     sleep 0.1
+    setup_game_with_players
   end
 
   after(:each) do
@@ -20,16 +21,36 @@ RSpec.describe GoFishLobby do
 
   let(:client1) { MockGoFishSocketClient.new(@server.port_number) }
   let(:client2) { MockGoFishSocketClient.new(@server.port_number) }
-
-  let(:player1) { @server.players.first }
-  let(:player2) { @server.players.last }
-  let(:players) { [player1, player2] }
-  # let(:game) { @server.game }
   
-  it 'initializes with players_clients' do
-    setup_game_with_players
+  let(:players) { @server.players }
+  let(:player1) { players.first }
+  let(:player2) { players.last }
+  let(:lobby) {@server.lobbies.first }
+  # let(:game) { @server.games.first }
+
+  it 'outputs every players hand to every player' do
+    lobby.play_round
+
+    expect(client1.capture_output).to match /Your cards/i
+    expect(client2.capture_output).to match /Your cards/i
+  end
+
+  it 'gets a card rank request from the current player' do
+    lobby.play_round
+
+    expect(client1.capture_output).to match /Please request a card rank/i
+  end
+
+  it 'displays the opponents' do
+    lobby.play_round
+
+    expect(client1.capture_output).to match /opponents:/i
+  end
+
+  it 'gets a target player from the current player' do
+    lobby.play_round
     
-    expect(@server.lobbies.first.players_clients[player1]).to eq(@server.clients.first)
+    expect(client1.capture_output). to match /Which opponent would you like to request from:/i
   end
 
   private
@@ -40,7 +61,6 @@ RSpec.describe GoFishLobby do
 
     @clients.push(client2)
     @server.accept_new_client('Player 2')
-
     @server.create_game_if_possible
   end
 end
