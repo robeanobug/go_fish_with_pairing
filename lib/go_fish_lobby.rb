@@ -9,12 +9,15 @@ class GoFishLobby
     @players_clients = players_clients
   end
 
-  def play_round
+  # run_game
+
+  def run_round
     display_hands unless displayed_hand
-    get_rank
+    get_rank if displayed_hand && !rank
     display_opponents if rank && !displayed_opponents
     get_opponent if rank && !opponent
-    display_result if rank && opponent 
+    # play_round(rank, opponent)
+    display_result if rank && opponent
   end
 
   private
@@ -59,7 +62,6 @@ class GoFishLobby
   end
 
   def get_rank
-    return rank if rank
     current_client.puts 'Please request a card rank: ' unless requested_card_rank
     self.requested_card_rank = true
     self.rank = listen_to_current_client
