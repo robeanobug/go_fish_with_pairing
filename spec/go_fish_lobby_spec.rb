@@ -52,6 +52,8 @@ RSpec.describe GoFishLobby do
 
     expect(client1.capture_output).to match /You requested: Ace/i
     lobby.play_round
+    expect(client1.capture_output).to_not match /You requested:/i
+
   end
 
   it 'displays the opponents' do
