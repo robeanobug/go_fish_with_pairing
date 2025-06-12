@@ -27,52 +27,60 @@ RSpec.describe GoFishLobby do
   let(:player2) { players.last }
   let(:lobby) { @server.lobbies.first }
   # let(:game) { @server.games.first }
-
-  it 'outputs every players hand to every player once' do
-    lobby.play_round
-
-    expect(client1.capture_output).to match /Your cards/i
-    expect(client2.capture_output).to match /Your cards/i
-    lobby.play_round
-    expect(client1.capture_output).to_not match /Your cards/i
-  end
-
-  it 'requests a card rank from the current player once' do
-    lobby.play_round
-
-    expect(client1.capture_output).to match /Please request a card rank/i
-    lobby.play_round
-    expect(client1.capture_output).to_not match /Please request a card rank/i
-  end
-
-  it 'gets a card rank request from the current player' do
-    lobby.play_round
-    client1.provide_input('Ace')
-    lobby.play_round
-
-    expect(client1.capture_output).to match /You requested: Ace/i
-    lobby.play_round
-    expect(client1.capture_output).to_not match /You requested:/i
-
-  end
-
-  it 'displays the opponents once' do
-    lobby.play_round
-
-    expect(client1.capture_output).to match /opponents:/i
-    lobby.play_round
-    expect(client1.capture_output).to_not match /opponents:/i
-  end
-
-  it 'gets a target player from the current player' do
-    lobby.play_round
+  describe '#play_round' do
+    it 'outputs every players hand to every player once' do
+      lobby.play_round
+      expect(client1.capture_output).to match /Your cards/i
+      expect(client2.capture_output).to match /Your cards/i
+      lobby.play_round
+      expect(client1.capture_output).to_not match /Your cards/i
+    end
+  
+    it 'requests a card rank from the current player once' do
+      lobby.play_round
+      expect(client1.capture_output).to match /Please request a card rank/i
+      lobby.play_round
+      expect(client1.capture_output).to_not match /Please request a card rank/i
+    end
     
-    expect(client1.capture_output).to match /Which opponent would you like to request from:/i
-  end
+    describe 'getting a rank' do
+      before do
+        client1.provide_input('Ace')
+        lobby.play_round
+      end
 
-  it 'displays round results to players' do
-    lobby.play_round
-    expect(client1.capture_output).to match /result/i
+      it 'gets a card rank request from the current player' do
+        expect(client1.capture_output).to match /You requested: Ace/i
+        lobby.play_round
+        expect(client1.capture_output).to_not match /You requested:/i
+      end
+    end
+    
+    describe 'getting an opponent' do
+      before do
+        client1.provide_input('Ace')
+        lobby.play_round
+        client1.provide_input('Player 2')
+        lobby.play_round
+      end
+
+      it 'displays the opponents once' do
+        expect(client1.capture_output).to match /opponents:/i
+        lobby.play_round
+        expect(client1.capture_output).to_not match /opponents:/i
+      end
+    
+      it 'requests a target player from the current player once' do
+        expect(client1.capture_output).to match /Which opponent would you like to request from:/i
+        lobby.play_round
+        expect(client1.capture_output).to_not match /Which opponent would you like to request from:/i
+      end
+    end
+
+    it 'displays round results to players' do
+      lobby.play_round
+      expect(client1.capture_output).to match /result/i
+    end
   end
 
   private
