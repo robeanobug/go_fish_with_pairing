@@ -13,4 +13,12 @@ RSpec.describe GoFishGame do
   it 'has a current_player' do
     expect(game.current_player).to be_a(Player)
   end
+  
+  it 'has an opponent' do
+    expect(game.opponent).to be_a(Player)
+  end
+
+  it 'has a round result' do
+    expect(game.result).to be_a(Result)
+  end
 end

@@ -1,5 +1,6 @@
 require 'socket'
 require_relative 'go_fish_game'
+require_relative 'go_fish_lobby'
 
 class GoFishSocketServer
   attr_accessor :server, :clients, :players, :lobbies, :games

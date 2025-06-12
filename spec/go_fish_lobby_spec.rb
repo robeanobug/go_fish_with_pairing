@@ -25,7 +25,7 @@ RSpec.describe GoFishLobby do
   let(:players) { @server.players }
   let(:player1) { players.first }
   let(:player2) { players.last }
-  let(:lobby) {@server.lobbies.first }
+  let(:lobby) { @server.lobbies.first }
   # let(:game) { @server.games.first }
 
   it 'outputs every players hand to every player' do
@@ -51,6 +51,11 @@ RSpec.describe GoFishLobby do
     lobby.play_round
     
     expect(client1.capture_output). to match /Which opponent would you like to request from:/i
+  end
+
+  it 'displays round results to players' do
+    lobby.play_round
+    expect(client1.capture_output). to match /result/i
   end
 
   private

@@ -50,7 +50,7 @@ RSpec.describe GoFishSocketServer do
   it 'creates a game to play the game in' do
     setup_game_with_players
 
-    expect(@server.games.length).to be 1
+    expect(@server.games.length).to eq(1)
   end
 
   it 'creates a game lobby' do
