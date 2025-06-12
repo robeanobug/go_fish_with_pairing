@@ -14,8 +14,9 @@ class GoFishSocketServer
     @lobbies = []
   end
 
-  def accept_new_client(player_name = 'Random Player')
+  def accept_new_client(player_name=nil)
     client = server.accept_nonblock
+    player_name = get_player_name(client) unless player_name
     players << Player.new(player_name)
     clients << client
     client.puts 'Welcome to Go Fish!'
@@ -46,8 +47,21 @@ class GoFishSocketServer
 
   private
 
+  def get_player_name(client)
+    client.puts 'What is your name?'
+    name = listen_to_client(client)
+    client.puts "Hello, #{ name }"
+  end
+
   def send_message_to_all_clients(message)
     clients.each { |client| client.puts message} unless sent_message_to_all_clients
     self.sent_message_to_all_clients = true
+  end
+
+  def listen_to_client(client, delay=0.1)
+    sleep(delay)
+    client.read_nonblock(200_000).chomp
+  rescue IO::WaitReadable
+    nil
   end
 end

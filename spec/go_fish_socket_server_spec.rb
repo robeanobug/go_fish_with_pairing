@@ -33,6 +33,20 @@ RSpec.describe GoFishSocketServer do
     expect(@server.players.count).to eq(player_count)
   end
 
+  it 'asks for a player name' do
+    @clients.push(client1)
+    @server.accept_new_client
+    expect(client1.capture_output).to match /name/i
+  end
+
+  it 'displays name back to the player' do
+    name = "Player"
+    @clients.push(client1)
+    client1.provide_input(name)
+    @server.accept_new_client
+    expect(client1.capture_output).to include name
+  end
+
   it 'sends clients a welcome message' do
     setup_game_with_players
 
@@ -61,6 +75,7 @@ RSpec.describe GoFishSocketServer do
 
     expect(@server.lobbies.length).to be 1
   end
+
 
   private
 
