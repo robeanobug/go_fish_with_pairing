@@ -8,6 +8,11 @@ class Result
     @cards_recieved = cards_recieved
   end
 
+  # current_player, target, card_request, matching_cards, fished_card then determine swapped_turns
+
+  # expected to handle all scenarios
+  # broadcasting the turn change is not a responsibility of the round result, doesn't know who's next
+
   def current_player_result
     # "You took #{cards_recieved.map { |card| "#{card.rank} of #{card.suit }" } } from #{ opponent.name }"
     "You took a card"
