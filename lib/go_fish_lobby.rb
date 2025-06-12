@@ -14,7 +14,7 @@ class GoFishLobby
     get_rank
     display_opponents if rank && !displayed_opponents
     get_opponent if rank && !opponent
-    display_result
+    display_result if rank && opponent 
   end
 
   private

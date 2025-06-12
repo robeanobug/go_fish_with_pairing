@@ -77,9 +77,40 @@ RSpec.describe GoFishLobby do
       end
     end
 
-    it 'displays round results to players' do
-      lobby.play_round
-      expect(client1.capture_output).to match /result/i
+    describe 'displaying results' do
+      context 'when player has input rank and opponent' do
+        before do
+          client1.provide_input('Ace')
+          lobby.play_round
+          client1.provide_input('Player 2')
+          lobby.play_round
+        end
+
+        it 'displays round results to players' do
+          expect(client1.capture_output).to match /result/i
+        end
+      end
+
+      context 'when player has input rank but not opponent' do
+        before do
+          client1.provide_input('Ace')
+          lobby.play_round
+        end
+
+        it 'displays round results to players' do
+          expect(client1.capture_output).to_not match /result/i
+        end
+      end
+
+      context 'when player has not input anything' do
+        before do
+          lobby.play_round 
+        end
+        
+        it 'displays round results to players' do
+          expect(client1.capture_output).to_not match /result/i
+        end
+      end
     end
   end
 
