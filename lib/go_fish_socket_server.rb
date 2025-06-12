@@ -1,9 +1,10 @@
 require 'socket'
 require_relative 'go_fish_game'
 require_relative 'go_fish_lobby'
+require_relative 'player'
 
 class GoFishSocketServer
-  attr_accessor :server, :clients, :players, :lobbies, :games
+  attr_accessor :server, :clients, :players, :lobbies, :games, :sent_message_to_all_clients
   attr_reader :port_number
   def initialize
     @port_number = 3336
@@ -46,7 +47,7 @@ class GoFishSocketServer
   private
 
   def send_message_to_all_clients(message)
-    clients.each { |client| client.puts message}
+    clients.each { |client| client.puts message} unless sent_message_to_all_clients
+    self.sent_message_to_all_clients = true
   end
-
 end

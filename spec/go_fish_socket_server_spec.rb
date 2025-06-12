@@ -40,11 +40,14 @@ RSpec.describe GoFishSocketServer do
     expect(client2.capture_output).to match /welcome/i
   end
 
-  it 'outputs game is starting to clients' do
+  it 'outputs game is starting to clients once' do
     setup_game_with_players
 
     expect(client1.capture_output).to match /game is starting/i
     expect(client2.capture_output).to match /game is starting/i
+    @server.create_game_if_possible
+    expect(client1.capture_output).to_not match /game is starting/i
+    expect(client2.capture_output).to_not match /game is starting/i
   end
 
   it 'creates a game to play the game in' do
