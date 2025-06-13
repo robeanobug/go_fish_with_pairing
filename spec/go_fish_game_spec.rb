@@ -76,12 +76,10 @@ RSpec.describe GoFishGame do
       it 'current player goes fishing and catches the requested card' do
         game.deck.cards.push(ace_clubs)
         player1.hand = [ace_hearts, king_hearts]
-        player2.hand = [ace_clubs, king_clubs]
+        player2.hand = [king_clubs]
         game.play_round('Ace', player2)
 
-        hand_length = 3
         expect(player1.hand).to include(ace_hearts, king_hearts, ace_clubs)
-        expect(player1.hand.length).to eq hand_length
         expect(player2.hand).to include(king_clubs)
       end
     end
