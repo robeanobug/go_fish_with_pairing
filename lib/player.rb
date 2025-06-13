@@ -1,6 +1,8 @@
 class Player
   attr_reader :name
   attr_accessor :hand
+  BASE_HAND_SIZE = 7
+  SMALL_HAND_SIZE = 5
   def initialize(name)
     @name = name
     @hand = []

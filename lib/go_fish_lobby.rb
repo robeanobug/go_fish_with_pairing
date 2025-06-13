@@ -70,6 +70,7 @@ class GoFishLobby
     current_client.puts 'Please request a card rank: ' unless requested_card_rank
     self.requested_card_rank = true
     self.rank = valid_rank(listen_to_current_client)
+    # self.requested_rank
     current_client.puts "You requested: #{rank}" if rank
   end
 
@@ -107,6 +108,7 @@ class GoFishLobby
   end
 
   def play_round(rank, opponent)
+    # need to move this into game class along with tests
     go_fish unless take_cards(rank, opponent)
   end
 

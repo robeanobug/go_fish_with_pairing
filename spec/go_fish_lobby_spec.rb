@@ -56,7 +56,6 @@ RSpec.describe GoFishLobby do
           expect(client1.capture_output).to_not match /You requested:/i
         end
       end
-
       context 'when a rank is invalid' do
         before do
           client1.provide_input('foo')
@@ -94,6 +93,7 @@ RSpec.describe GoFishLobby do
       let(:ace_clubs) { PlayingCard.new('Ace', 'Clubs') }
       let(:king_hearts) { PlayingCard.new('King', 'Hearts') }
       let(:king_clubs) { PlayingCard.new('King', 'Clubs') }
+
       context 'when turn stays the same' do
         context 'When player 1 gets a card from player 2' do
           before do
@@ -104,12 +104,20 @@ RSpec.describe GoFishLobby do
             client1.provide_input('Player 2')
             lobby.run_round
           end
-          it 'Player 1 should have all the cards of the asked rank from Player 2' do
+          # only test ouputs in the lobby, the actual card output should be in the game
+          xit 'Player 1 should have all the cards of the asked rank from Player 2' do
             expect(player1.hand).to include(ace_hearts, king_hearts, ace_clubs)
             expect(player2.hand).to include(king_clubs)
           end
+          xit 'Player 1 goes fish and catches the requested card, Player 2 has original cards' do
+            # need to set up deck so player will go fish and get the card they want
+            hand_length = 3
+            expect(player1.hand).to include(ace_hearts, king_hearts)
+            expect(player1.hand.length).to eq hand_length
+            expect(player2.hand).to include(king_clubs)
+          end
         end
-        context 'When player goes fish' do
+        context 'When turns changes' do
           before do
             player1.hand = [ace_hearts, king_hearts]
             player2.hand = [king_clubs]
@@ -118,13 +126,8 @@ RSpec.describe GoFishLobby do
             client1.provide_input('Player 2')
             lobby.run_round
           end
-          it 'Player 1 has original cards with an added card, Player 2 has original cards' do
-            hand_length = 3
-            expect(player1.hand).to include(ace_hearts, king_hearts)
-            expect(player1.hand.length).to eq hand_length
-            expect(player2.hand).to include(king_clubs)
-          end
-          it 'Player 1 goes fish and catches the requested card, Player 2 has original cards' do
+          xit 'Player 1 tries to go fish for a card but does not collect it' do
+            # need to set up deck so player will go fish and they do not get the card they want
             hand_length = 3
             expect(player1.hand).to include(ace_hearts, king_hearts)
             expect(player1.hand.length).to eq hand_length
@@ -134,6 +137,11 @@ RSpec.describe GoFishLobby do
       end
 
       context 'when player 1 has to go fish' do
+        let(:ace_hearts) { PlayingCard.new('Ace', 'Hearts') }
+        let(:ace_clubs) { PlayingCard.new('Ace', 'Clubs') }
+        let(:king_hearts) { PlayingCard.new('King', 'Hearts') }
+        let(:king_clubs) { PlayingCard.new('King', 'Clubs') }
+
         before do
           player1.hand = [ace_hearts, king_hearts]
           player2.hand = [king_clubs]
@@ -159,7 +167,13 @@ RSpec.describe GoFishLobby do
 
     describe 'displaying results' do
       context 'when player has input rank and opponent' do
+        let(:ace_hearts) { PlayingCard.new('Ace', 'Hearts') }
+        let(:ace_clubs) { PlayingCard.new('Ace', 'Clubs') }
+        let(:king_hearts) { PlayingCard.new('King', 'Hearts') }
+        let(:king_clubs) { PlayingCard.new('King', 'Clubs') }
         before do
+          player1.hand = [ace_hearts, king_hearts]
+          player2.hand = [ace_clubs, king_clubs]
           client1.provide_input('Ace')
           lobby.run_round
           client1.provide_input('Player 2')
@@ -167,8 +181,9 @@ RSpec.describe GoFishLobby do
         end
         xit 'displays round results to players once' do
           expect(client1.capture_output).to include('You', 'took', 'Ace', 'Player 2')
+          # You took a Ace of Clubs from Player 2.
           lobby.run_round
-          expect(client1.capture_output).to include('You', 'took', 'Ace', 'Player 2')
+          expect(client1.capture_output).to_not include('You', 'took', 'Ace', 'Player 2')
         end
       end
 
