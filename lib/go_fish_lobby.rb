@@ -102,15 +102,24 @@ class GoFishLobby
   end
 
   def play_round(rank, opponent)
-    take_cards(rank, opponent)
+    go_fish unless take_cards(rank, opponent)
   end
 
   def take_cards(rank, opponent)
     cards = opponent.hand.select { |card| card.rank == rank }
-    if cards
+    unless cards.empty?
       opponent.remove_cards(cards)
-      current_player.add_cards(cards)
+      return current_player.add_cards(cards)
     end
+    false
+  end
+
+  def go_fish
+    current_player.add_cards(deal_card)
+  end
+
+  def deal_card
+    game.deal_card
   end
 
   def display_result

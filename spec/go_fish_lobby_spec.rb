@@ -113,7 +113,7 @@ RSpec.describe GoFishLobby do
         end
       end
 
-      xcontext 'when player 1 has to go fish' do
+      context 'when player 1 has to go fish' do
         before do
           player1.hand = [ace_hearts, king_hearts]
           player2.hand = [king_clubs]
@@ -122,7 +122,13 @@ RSpec.describe GoFishLobby do
           client1.provide_input('Player 2')
           lobby.run_round
         end
-        it 'when player 1 gets a card from player 2' do
+        it 'Player 1 has original cards with an added card, Player 2 has original cards' do
+          hand_length = 3
+          expect(player1.hand).to include(ace_hearts, king_hearts)
+          expect(player1.hand.length).to eq hand_length
+          expect(player2.hand).to include(king_clubs)
+        end
+        xit 'Player 1 catches the requested card, Player 2 has original cards' do
           hand_length = 3
           expect(player1.hand).to include(ace_hearts, king_hearts)
           expect(player1.hand.length).to eq hand_length
@@ -167,10 +173,6 @@ RSpec.describe GoFishLobby do
       end
     end
   end
-
-  # want a red test that fails because I don't have the right result
-  # rank requested and player requested, was it a go_fish or was it found in the players hand
-  # hand size changed
 
   private
 

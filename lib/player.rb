@@ -7,7 +7,8 @@ class Player
   end
 
   def add_cards(cards)
-    cards.each { |card| hand << card}
+    return hand << cards if cards.is_a?(PlayingCard)
+    cards.each { |card| hand << card }
   end
 
   def remove_cards(cards)
