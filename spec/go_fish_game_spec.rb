@@ -35,12 +35,11 @@ RSpec.describe GoFishGame do
     end
   end
 
-  describe '#deal_cards' do
+  describe '#start' do
     it 'should deal out the base hand size to 2 players' do
       game.start
       expect(game.current_player.hand.size).to eq(Player::BASE_HAND_SIZE)
     end
-    
     it 'should deal out the small hand size to 4 players' do
       game_with_four_players.start
       expect(game_with_four_players.current_player.hand.size).to eq(Player::SMALL_HAND_SIZE)
@@ -48,33 +47,54 @@ RSpec.describe GoFishGame do
   end
 
   describe '#play_round' do
-    let(:ace_hearts) { PlayingCard.new('Ace', 'Hearts') }
-    let(:king_hearts) { PlayingCard.new('King', 'Hearts') }
-    let(:ace_clubs) { PlayingCard.new('Ace', 'Clubs') }
-    let(:king_clubs) { PlayingCard.new('King', 'Clubs') }
+  let(:ace_hearts) { PlayingCard.new('Ace', 'Hearts') }
+  let(:king_hearts) { PlayingCard.new('King', 'Hearts') }
+  let(:ace_clubs) { PlayingCard.new('Ace', 'Clubs') }
+  let(:king_clubs) { PlayingCard.new('King', 'Clubs')}
+  let(:ace_diamonds) { PlayingCard.new('Ace', 'Diamonds') }
+  let(:ace_spades) { PlayingCard.new('Ace', 'Spades') }
+  let(:two_hearts) { PlayingCard.new('2', 'Hearts') }
 
-    context 'When player 1 gets a card from player 2' do
-      before do
+    context "When the current player's turn stays" do
+      it 'current player gets cards from opponent' do
         player1.hand = [ace_hearts, king_hearts]
         player2.hand = [ace_clubs, king_clubs]
-        game.play_round(rank, opponent)
-      end
-      # only test ouputs in the lobby, the actual card output should be in the game
-      xit 'Player 1 should have all the cards of the asked rank from Player 2' do
+        game.play_round('Ace', player2)
+
         expect(player1.hand).to include(ace_hearts, king_hearts, ace_clubs)
         expect(player2.hand).to include(king_clubs)
       end
-      xit 'Player 1 goes fish and catches the requested card, Player 2 has original cards' do
-        # need to set up deck so player will go fish and get the card they want
+      it 'current player gets cards from opponent and creates a book' do
+        player1.hand = [ace_hearts, king_hearts]
+        player2.hand = [ace_clubs, ace_spades, ace_diamonds, king_clubs]
+        game.play_round('Ace', player2)
+
+        expect(player1.hand).to include(king_hearts)
+        expect(player2.hand).to include(king_clubs)
+      end
+
+      it 'current player goes fishing and catches the requested card' do
+        game.deck.cards.push(ace_clubs)
+        player1.hand = [ace_hearts, king_hearts]
+        player2.hand = [ace_clubs, king_clubs]
+        game.play_round('Ace', player2)
+
         hand_length = 3
-        expect(player1.hand).to include(ace_hearts, king_hearts)
+        expect(player1.hand).to include(ace_hearts, king_hearts, ace_clubs)
         expect(player1.hand.length).to eq hand_length
         expect(player2.hand).to include(king_clubs)
       end
     end
-    xit 'current player asks for a card and gets from opponent' do
-      expect(player1.hand).to include(ace_hearts, king_hearts, ace_clubs)
-      expect(player2.hand).to include(king_clubs)
+    context "When the current player's turn changes" do
+      it 'current player goes fishing and does not catch the requested card' do
+        game.deck.cards.push(two_hearts)
+        player1.hand = [ace_hearts, king_hearts]
+        player2.hand = [king_clubs]
+        game.play_round('Ace', player2)
+
+        expect(player1.hand).to eq([ace_hearts, king_hearts, two_hearts])
+        expect(player2.hand).to eq([king_clubs])
+      end
     end
   end
 end

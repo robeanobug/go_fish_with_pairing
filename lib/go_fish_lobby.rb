@@ -109,20 +109,7 @@ class GoFishLobby
 
   def play_round(rank, opponent)
     # need to move this into game class along with tests
-    go_fish unless take_cards(rank, opponent)
-  end
-
-  def take_cards(rank, opponent)
-    cards = opponent.hand.select { |card| card.rank == rank }
-    unless cards.empty?
-      opponent.remove_cards(cards)
-      return current_player.add_cards(cards)
-    end
-    false
-  end
-
-  def go_fish
-    current_player.add_cards(deal_card)
+    game.play_round(rank, opponent)
   end
 
   def deal_card
