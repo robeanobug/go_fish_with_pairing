@@ -75,8 +75,6 @@ RSpec.describe GoFishLobby do
       before do
         client1.provide_input('Ace')
         lobby.run_round
-        client1.provide_input('Player 2')
-        lobby.run_round
       end
 
       it 'displays the opponents once' do
@@ -84,7 +82,6 @@ RSpec.describe GoFishLobby do
         lobby.run_round
         expect(client1.capture_output).to_not match /opponents:/i
       end
-    
       it 'requests a target player from the current player once' do
         expect(client1.capture_output).to match /Which opponent would you like to request from:/i
         lobby.run_round
@@ -97,19 +94,42 @@ RSpec.describe GoFishLobby do
       let(:ace_clubs) { PlayingCard.new('Ace', 'Clubs') }
       let(:king_hearts) { PlayingCard.new('King', 'Hearts') }
       let(:king_clubs) { PlayingCard.new('King', 'Clubs') }
-
-      context 'when player 1 gets a card from player 2' do
-        before do
-          player1.hand = [ace_hearts, king_hearts]
-          player2.hand = [ace_clubs, king_clubs]
-          client1.provide_input('Ace')
-          lobby.run_round
-          client1.provide_input('Player 2')
-          lobby.run_round
+      context 'when turn stays the same' do
+        context 'When player 1 gets a card from player 2' do
+          before do
+            player1.hand = [ace_hearts, king_hearts]
+            player2.hand = [ace_clubs, king_clubs]
+            client1.provide_input('Ace')
+            lobby.run_round
+            client1.provide_input('Player 2')
+            lobby.run_round
+          end
+          it 'Player 1 should have all the cards of the asked rank from Player 2' do
+            expect(player1.hand).to include(ace_hearts, king_hearts, ace_clubs)
+            expect(player2.hand).to include(king_clubs)
+          end
         end
-        it 'Player 1 should have all the cards of the asked rank from Player 2' do
-          expect(player1.hand).to include(ace_hearts, king_hearts, ace_clubs)
-          expect(player2.hand).to include(king_clubs)
+        context 'When player goes fish' do
+          before do
+            player1.hand = [ace_hearts, king_hearts]
+            player2.hand = [king_clubs]
+            client1.provide_input('Ace')
+            lobby.run_round
+            client1.provide_input('Player 2')
+            lobby.run_round
+          end
+          it 'Player 1 has original cards with an added card, Player 2 has original cards' do
+            hand_length = 3
+            expect(player1.hand).to include(ace_hearts, king_hearts)
+            expect(player1.hand.length).to eq hand_length
+            expect(player2.hand).to include(king_clubs)
+          end
+          it 'Player 1 goes fish and catches the requested card, Player 2 has original cards' do
+            hand_length = 3
+            expect(player1.hand).to include(ace_hearts, king_hearts)
+            expect(player1.hand.length).to eq hand_length
+            expect(player2.hand).to include(king_clubs)
+          end
         end
       end
 
@@ -128,7 +148,7 @@ RSpec.describe GoFishLobby do
           expect(player1.hand.length).to eq hand_length
           expect(player2.hand).to include(king_clubs)
         end
-        xit 'Player 1 catches the requested card, Player 2 has original cards' do
+        it 'Player 1 goes fish and catches the requested card, Player 2 has original cards' do
           hand_length = 3
           expect(player1.hand).to include(ace_hearts, king_hearts)
           expect(player1.hand.length).to eq hand_length
@@ -145,9 +165,10 @@ RSpec.describe GoFishLobby do
           client1.provide_input('Player 2')
           lobby.run_round
         end
-
-        xit 'displays round results to players' do
-          expect(client1.capture_output).to include('Player 1', 'Player 2', 'Ace')
+        xit 'displays round results to players once' do
+          expect(client1.capture_output).to include('You', 'took', 'Ace', 'Player 2')
+          lobby.run_round
+          expect(client1.capture_output).to include('You', 'took', 'Ace', 'Player 2')
         end
       end
 
@@ -178,10 +199,15 @@ RSpec.describe GoFishLobby do
 
   def setup_game_with_players
     @clients.push(client1)
-    @server.accept_new_client('Player 1')
+    client1.provide_input('Player 1')
+    @server.accept_new_client
+    @server.get_player_name
 
     @clients.push(client2)
-    @server.accept_new_client('Player 2')
+    client2.provide_input('Player 2')
+    @server.accept_new_client
+    @server.get_player_name
+
     @server.create_game_if_possible
   end
 end

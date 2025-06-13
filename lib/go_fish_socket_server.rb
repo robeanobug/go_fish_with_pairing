@@ -4,11 +4,12 @@ require_relative 'go_fish_lobby'
 require_relative 'player'
 
 class GoFishSocketServer
-  attr_accessor :server, :clients, :players, :lobbies, :games, :sent_message_to_all_clients
+  attr_accessor :server, :clients_waiting, :clients_in_lobby, :players, :lobbies, :games, :sent_message_to_all_clients
   attr_reader :port_number
   def initialize
     @port_number = 3336
-    @clients = []
+    @clients_waiting = []
+    @clients_in_lobby = []
     @players = []
     @games = []
     @lobbies = []
@@ -16,25 +17,41 @@ class GoFishSocketServer
 
   def accept_new_client(player_name=nil)
     client = server.accept_nonblock
-    player_name = get_player_name(client) unless player_name
-    players << Player.new(player_name)
-    clients << client
+    clients_waiting << client
     client.puts 'Welcome to Go Fish!'
+    client.puts 'What is your name:' 
+    client
   rescue IO::WaitReadable, Errno::EINTR
     puts 'No client to accept'
+  end
+
+  def get_player_name
+    clients_waiting.each do |client|
+      name = listen_to_client(client)
+      return if name.nil?
+      move_clients_to_lobby(client)
+      client.puts "Hello, #{ name }"
+      players << Player.new(name)
+    end
   end
 
   def create_game_if_possible
     if players.count > 1
       game = GoFishGame.new(players)
       games << game
-      lobbies << GoFishLobby.new(game, players_clients)
+      lobby = GoFishLobby.new(game, players_clients)
+      lobbies << lobby
       send_message_to_all_clients('Game is starting...')
+      lobby
     end
   end
 
   def players_clients
-    players.zip(clients).to_h
+    players.zip(clients_in_lobby).to_h
+  end
+
+  def run_game(lobby)
+    lobby.run_game
   end
 
   def start
@@ -44,18 +61,20 @@ class GoFishSocketServer
   def stop
     server.close if server
   end
+  
 
   private
 
-  def get_player_name(client)
-    client.puts 'What is your name?'
-    name = listen_to_client(client)
-    client.puts "Hello, #{ name }"
+  def send_message_to_all_clients(message)
+    unless sent_message_to_all_clients
+      clients_in_lobby.each { |client| client.puts message}
+    end
+    self.sent_message_to_all_clients = true
   end
 
-  def send_message_to_all_clients(message)
-    clients.each { |client| client.puts message} unless sent_message_to_all_clients
-    self.sent_message_to_all_clients = true
+  def move_clients_to_lobby(client)
+    self.clients_waiting -= [client]
+    clients_in_lobby << client
   end
 
   def listen_to_client(client, delay=0.1)

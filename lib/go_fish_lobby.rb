@@ -4,13 +4,17 @@ require_relative 'player'
 
 class GoFishLobby
   attr_reader :game, :players_clients
-  attr_accessor :displayed_hand, :requested_card_rank, :rank, :displayed_opponents, :opponent
+  attr_accessor :displayed_hand, :requested_card_rank, :rank, :displayed_opponents, :requested_opponent, :opponent
   def initialize(game, players_clients)
     @game = game
     @players_clients = players_clients
   end
 
-  # run_game
+  def run_game
+    loop do
+      run_round
+    end
+  end
 
   def run_round
     display_hands unless displayed_hand
@@ -53,7 +57,7 @@ class GoFishLobby
 
   def display_hands
     clients.each do |client|
-      client.puts "Your cards: #{ get_cards(clients_players[client]) } }"
+      client.puts "Your cards: #{ get_cards(clients_players[client]) }"
     end
     self.displayed_hand = true
   end
@@ -82,7 +86,7 @@ class GoFishLobby
   end
 
   def display_opponents
-    current_client.puts "Your opponents: #{ opponents }" unless displayed_opponents
+    current_client.puts "Your opponents: #{ opponents.map(&:name) }" unless displayed_opponents
     self.displayed_opponents = true
   end
 
@@ -91,7 +95,8 @@ class GoFishLobby
   end
 
   def get_opponent
-    current_client.puts 'Which opponent would you like to request from:'
+    current_client.puts 'Which opponent would you like to request from:' unless requested_opponent
+    self.requested_opponent = true
     self.opponent = valid_player(listen_to_current_client)
   end
 

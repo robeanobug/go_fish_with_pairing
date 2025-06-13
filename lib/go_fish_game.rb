@@ -20,6 +20,6 @@ class GoFishGame
   end
 
   def result
-    Result.new('current_player', 'opponent', 'cards_recieved', 'fished_card')
+    Result.new(current_player, opponent, 'cards_recieved', 'fished_card')
   end
 end

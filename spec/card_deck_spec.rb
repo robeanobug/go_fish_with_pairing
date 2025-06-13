@@ -4,7 +4,7 @@ require_relative '../lib/card_deck'
 RSpec.describe CardDeck do
   let(:deck) { CardDeck.new }
   it 'has a specified deck length' do
-    expect(deck.cards.length).to eq CardDeck::DECK_SIZE
+    expect(deck.cards.length).to eq CardDeck::DECK_COUNT
   end
   it 'holds playing cards' do
     expect(deck.cards.first).to be_a(PlayingCard)

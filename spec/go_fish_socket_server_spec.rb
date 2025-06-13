@@ -26,24 +26,34 @@ RSpec.describe GoFishSocketServer do
   end
 
   it 'accepts a new client' do
+    name = 'John Doe'
     player_count = 1
     @clients.push(client1)
-    @server.accept_new_client('Player 1')
+    @server.accept_new_client
+    client1.provide_input(name)
+    @server.get_player_name
 
     expect(@server.players.count).to eq(player_count)
   end
 
   it 'asks for a player name' do
+    name = 'John Doe'
     @clients.push(client1)
     @server.accept_new_client
+    client1.provide_input(name)
+    @server.get_player_name
+
     expect(client1.capture_output).to match /name/i
   end
 
   it 'displays name back to the player' do
-    name = "Player"
+    name = 'John Doe'
     @clients.push(client1)
-    client1.provide_input(name)
     @server.accept_new_client
+    client1.provide_input(name)
+    @server.get_player_name
+
+    client1.provide_input(name)
     expect(client1.capture_output).to include name
   end
 
@@ -76,15 +86,18 @@ RSpec.describe GoFishSocketServer do
     expect(@server.lobbies.length).to be 1
   end
 
-
   private
 
   def setup_game_with_players
     @clients.push(client1)
-    @server.accept_new_client('Player 1')
+    client1.provide_input('Player 1')
+    @server.accept_new_client
+    @server.get_player_name
 
     @clients.push(client2)
-    @server.accept_new_client('Player 2')
+    client2.provide_input('Player 2')
+    @server.accept_new_client
+    @server.get_player_name
 
     @server.create_game_if_possible
   end

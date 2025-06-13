@@ -24,7 +24,7 @@ RSpec.describe GoFishGame do
     end
   end
 
-  context '#deal_card' do
+  describe '#deal_card' do
     it 'should deal a card from the deck' do
       expect(game.deal_card).to be_a(PlayingCard)
     end
