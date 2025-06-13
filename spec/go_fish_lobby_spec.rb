@@ -45,15 +45,29 @@ RSpec.describe GoFishLobby do
     end
     
     describe 'getting a rank' do
-      before do
-        client1.provide_input('Ace')
-        lobby.run_round
+      context 'when a rank is valid' do
+        before do
+          client1.provide_input('Ace')
+          lobby.run_round
+        end
+        it 'gets a card rank request from the current player' do
+          expect(client1.capture_output).to match /You requested: Ace/i
+          lobby.run_round
+          expect(client1.capture_output).to_not match /You requested:/i
+        end
       end
 
-      it 'gets a card rank request from the current player' do
-        expect(client1.capture_output).to match /You requested: Ace/i
-        lobby.run_round
-        expect(client1.capture_output).to_not match /You requested:/i
+      context 'when a rank is invalid' do
+        before do
+          client1.provide_input('foo')
+          lobby.run_round
+        end
+        it 'gets a card rank request from the current player' do
+          expect(client1.capture_output).to match /Please request a card rank/i
+          client1.provide_input('Ace')
+          lobby.run_round
+          expect(client1.capture_output).to match /You requested: Ace/i
+        end
       end
     end
     
@@ -84,17 +98,36 @@ RSpec.describe GoFishLobby do
       let(:king_hearts) { PlayingCard.new('King', 'Hearts') }
       let(:king_clubs) { PlayingCard.new('King', 'Clubs') }
 
-      before do
-        player1.hand = [ace_hearts, king_hearts]
-        player2.hand = [ace_clubs, king_clubs]
-        client1.provide_input('Ace')
-        lobby.run_round
-        client1.provide_input('Player 2')
-        lobby.run_round
+      context 'when player 1 gets a card from player 2' do
+        before do
+          player1.hand = [ace_hearts, king_hearts]
+          player2.hand = [ace_clubs, king_clubs]
+          client1.provide_input('Ace')
+          lobby.run_round
+          client1.provide_input('Player 2')
+          lobby.run_round
+        end
+        it 'Player 1 should have all the cards of the asked rank from Player 2' do
+          expect(player1.hand).to include(ace_hearts, king_hearts, ace_clubs)
+          expect(player2.hand).to include(king_clubs)
+        end
       end
-      it 'when player 1 gets a card from player 2' do
-        expect(player1.hand).to include(ace_hearts, king_hearts, ace_clubs)
-        expect(player2.hand).to include(king_clubs)
+
+      xcontext 'when player 1 has to go fish' do
+        before do
+          player1.hand = [ace_hearts, king_hearts]
+          player2.hand = [king_clubs]
+          client1.provide_input('Ace')
+          lobby.run_round
+          client1.provide_input('Player 2')
+          lobby.run_round
+        end
+        it 'when player 1 gets a card from player 2' do
+          hand_length = 3
+          expect(player1.hand).to include(ace_hearts, king_hearts)
+          expect(player1.hand.length).to eq hand_length
+          expect(player2.hand).to include(king_clubs)
+        end
       end
     end
 

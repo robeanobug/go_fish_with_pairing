@@ -65,8 +65,13 @@ class GoFishLobby
   def get_rank
     current_client.puts 'Please request a card rank: ' unless requested_card_rank
     self.requested_card_rank = true
-    self.rank = listen_to_current_client
+    self.rank = valid_rank(listen_to_current_client)
     current_client.puts "You requested: #{rank}" if rank
+  end
+
+  def valid_rank(rank)
+    rank = rank&.capitalize
+    return rank if PlayingCard::RANKS.include?(rank)
   end
 
   def listen_to_current_client(delay=0.1)
