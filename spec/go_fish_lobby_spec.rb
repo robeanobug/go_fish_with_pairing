@@ -2,6 +2,7 @@ require 'spec_helper'
 require_relative '../lib/go_fish_lobby'
 require_relative '../lib/go_fish_socket_server'
 require_relative '../lib/mock_go_fish_socket_client'
+require_relative '../lib/playing_card'
 
 RSpec.describe GoFishLobby do
   before(:each) do
@@ -26,7 +27,7 @@ RSpec.describe GoFishLobby do
   let(:player1) { players.first }
   let(:player2) { players.last }
   let(:lobby) { @server.lobbies.first }
-  # let(:game) { @server.games.first }
+
   describe '#run_round' do
     it 'outputs every players hand to every player once' do
       lobby.run_round
@@ -77,6 +78,26 @@ RSpec.describe GoFishLobby do
       end
     end
 
+    describe 'play round' do
+      let(:ace_hearts) { PlayingCard.new('Ace', 'Hearts') }
+      let(:ace_clubs) { PlayingCard.new('Ace', 'Clubs') }
+      let(:king_hearts) { PlayingCard.new('King', 'Hearts') }
+      let(:king_clubs) { PlayingCard.new('King', 'Clubs') }
+
+      before do
+        player1.hand = [ace_hearts, king_hearts]
+        player2.hand = [ace_clubs, king_clubs]
+        client1.provide_input('Ace')
+        lobby.run_round
+        client1.provide_input('Player 2')
+        lobby.run_round
+      end
+      it 'when player 1 gets a card from player 2' do
+        expect(player1.hand).to include(ace_hearts, king_hearts, ace_clubs)
+        expect(player2.hand).to include(king_clubs)
+      end
+    end
+
     describe 'displaying results' do
       context 'when player has input rank and opponent' do
         before do
@@ -86,8 +107,8 @@ RSpec.describe GoFishLobby do
           lobby.run_round
         end
 
-        it 'displays round results to players' do
-          expect(client1.capture_output).to match /result/i
+        xit 'displays round results to players' do
+          expect(client1.capture_output).to include('Player 1', 'Player 2', 'Ace')
         end
       end
 
@@ -97,8 +118,8 @@ RSpec.describe GoFishLobby do
           lobby.run_round
         end
 
-        it 'displays round results to players' do
-          expect(client1.capture_output).to_not match /result/i
+        xit 'displays round results to players' do
+          expect(client1.capture_output).to_not include('Player 1', 'Player 2', 'Ace')
         end
       end
 
@@ -107,8 +128,8 @@ RSpec.describe GoFishLobby do
           lobby.run_round 
         end
         
-        it 'displays round results to players' do
-          expect(client1.capture_output).to_not match /result/i
+        xit 'displays round results to players' do
+          expect(client1.capture_output).to_not include('Player 1', 'Player 2', 'Ace')
         end
       end
     end

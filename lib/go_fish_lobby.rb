@@ -1,5 +1,6 @@
 require_relative 'go_fish_game'
 require_relative 'go_fish_socket_server'
+require_relative 'player'
 
 class GoFishLobby
   attr_reader :game, :players_clients
@@ -16,7 +17,7 @@ class GoFishLobby
     get_rank if displayed_hand && !rank
     display_opponents if rank && !displayed_opponents
     get_opponent if rank && !opponent
-    # play_round(rank, opponent)
+    play_round(rank, opponent) if rank && opponent
     display_result if rank && opponent
   end
 
@@ -86,7 +87,25 @@ class GoFishLobby
 
   def get_opponent
     current_client.puts 'Which opponent would you like to request from:'
-    self.opponent = listen_to_current_client
+    self.opponent = valid_player(listen_to_current_client)
+  end
+
+  def valid_player(player_name)
+    players.find do |player|
+      player.name.downcase == player_name&.downcase
+    end
+  end
+
+  def play_round(rank, opponent)
+    take_cards(rank, opponent)
+  end
+
+  def take_cards(rank, opponent)
+    cards = opponent.hand.select { |card| card.rank == rank }
+    if cards
+      opponent.remove_cards(cards)
+      current_player.add_cards(cards)
+    end
   end
 
   def display_result

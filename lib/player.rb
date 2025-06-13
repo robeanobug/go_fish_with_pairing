@@ -5,4 +5,12 @@ class Player
     @name = name
     @hand = []
   end
+
+  def add_cards(cards)
+    cards.each { |card| hand << card}
+  end
+
+  def remove_cards(cards)
+    self.hand -= cards
+  end
 end
