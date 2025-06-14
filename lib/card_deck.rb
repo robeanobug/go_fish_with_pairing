@@ -18,4 +18,9 @@ class CardDeck
   def deal_card
     cards.pop
   end
+
+  def add_cards(added_cards)
+    return cards << added_cards if added_cards.is_a?(PlayingCard)
+    added_cards.each { |card| cards << card }
+  end
 end

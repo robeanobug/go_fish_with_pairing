@@ -21,8 +21,8 @@ class GoFishLobby
     get_rank if displayed_hand && !rank
     display_opponents if rank && !displayed_opponents
     get_opponent if rank && !opponent
-    play_round(rank, opponent) if rank && opponent
-    display_result if rank && opponent
+    result = play_round(rank, opponent) if rank && opponent
+    display_result(result) if rank && opponent
   end
 
   private
@@ -70,7 +70,6 @@ class GoFishLobby
     current_client.puts 'Please request a card rank: ' unless requested_card_rank
     self.requested_card_rank = true
     self.rank = valid_rank(listen_to_current_client)
-    # self.requested_rank
     current_client.puts "You requested: #{rank}" if rank
   end
 
@@ -108,7 +107,6 @@ class GoFishLobby
   end
 
   def play_round(rank, opponent)
-    # need to move this into game class along with tests
     game.play_round(rank, opponent)
   end
 
@@ -116,13 +114,9 @@ class GoFishLobby
     game.deal_card
   end
 
-  def display_result
+  def display_result(result)
     current_client.puts "Result: #{ result.current_player_result }"
     opponent_client.puts "Result: #{ result.opponent_result }"
     bystanders.each { |bystander| players_clients[bystander].puts "Result: #{ result.bystanders_result}" }
-  end
-
-  def result
-    game.result
   end
 end

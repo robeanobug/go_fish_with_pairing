@@ -23,10 +23,6 @@ RSpec.describe GoFishGame do
     it 'has an opponent' do
       expect(game.opponent).to be_a(Player)
     end
-
-    it 'has a round result' do
-      expect(game.result).to be_a(Result)
-    end
   end
 
   describe '#deal_card' do
@@ -59,10 +55,11 @@ RSpec.describe GoFishGame do
       it 'current player gets cards from opponent' do
         player1.hand = [ace_hearts, king_hearts]
         player2.hand = [ace_clubs, king_clubs]
-        game.play_round('Ace', player2)
+        result = game.play_round('Ace', player2)
 
         expect(player1.hand).to include(ace_hearts, king_hearts, ace_clubs)
         expect(player2.hand).to include(king_clubs)
+        expect(result.current_player_result).to include('Ace', 'You', 'Player 2', 'took')
       end
       it 'current player gets cards from opponent and creates a book' do
         player1.hand = [ace_hearts, king_hearts]
@@ -74,7 +71,7 @@ RSpec.describe GoFishGame do
       end
 
       it 'current player goes fishing and catches the requested card' do
-        game.deck.cards.push(ace_clubs)
+        game.deck.add_cards(ace_clubs)
         player1.hand = [ace_hearts, king_hearts]
         player2.hand = [king_clubs]
         game.play_round('Ace', player2)
@@ -85,7 +82,7 @@ RSpec.describe GoFishGame do
     end
     context "When the current player's turn changes" do
       it 'current player goes fishing and does not catch the requested card' do
-        game.deck.cards.push(two_hearts)
+        game.deck.add_cards(two_hearts)
         player1.hand = [ace_hearts, king_hearts]
         player2.hand = [king_clubs]
         game.play_round('Ace', player2)

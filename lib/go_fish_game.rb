@@ -17,20 +17,22 @@ class GoFishGame
   end
 
   def play_round(rank, opponent)
-    go_fish unless take_cards(rank, opponent)
-    result
+    taken_cards = take_cards(rank, opponent)
+    unless taken_cards
+      fished_card = go_fish
+    end
+    result(fished_card: fished_card, taken_cards: taken_cards, rank: rank)
   end
   
   def deal_card
     deck.deal_card
   end
   
-  def result
-    Result.new(current_player, opponent, 'cards_recieved', 'fished_card')
+  def result(fished_card:, taken_cards:, rank:)
+    Result.new(current_player:, opponent:, rank:, taken_cards:, fished_card:)
   end
-
   private
-
+  
   def deal_cards
     if players.length > 3
       Player::SMALL_HAND_SIZE.times do
@@ -46,17 +48,19 @@ class GoFishGame
       end
     end
   end
-
+  
   def go_fish
-    current_player.add_cards(deal_card)
+    dealt_card = deal_card
+    current_player.add_cards(dealt_card)
+    dealt_card
   end
-
+  
   def take_cards(rank, opponent)
     cards = opponent.hand.select { |card| card.rank == rank }
     unless cards.empty?
       opponent.remove_cards(cards)
       return current_player.add_cards(cards)
     end
-    false
+    nil
   end
 end

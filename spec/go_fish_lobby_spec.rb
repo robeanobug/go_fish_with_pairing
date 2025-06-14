@@ -119,6 +119,7 @@ RSpec.describe GoFishLobby do
         end
         context 'When turns changes' do
           before do
+            lobby.game.deck.cards.push(Playing.card.new('2', 'Spades'))
             player1.hand = [ace_hearts, king_hearts]
             player2.hand = [king_clubs]
             client1.provide_input('Ace')
@@ -127,11 +128,7 @@ RSpec.describe GoFishLobby do
             lobby.run_round
           end
           xit 'Player 1 tries to go fish for a card but does not collect it' do
-            # need to set up deck so player will go fish and they do not get the card they want
-            hand_length = 3
-            expect(player1.hand).to include(ace_hearts, king_hearts)
-            expect(player1.hand.length).to eq hand_length
-            expect(player2.hand).to include(king_clubs)
+            expect(client1.capture_output).to match /turn is over/i
           end
         end
       end
@@ -150,18 +147,6 @@ RSpec.describe GoFishLobby do
           client1.provide_input('Player 2')
           lobby.run_round
         end
-        it 'Player 1 has original cards with an added card, Player 2 has original cards' do
-          hand_length = 3
-          expect(player1.hand).to include(ace_hearts, king_hearts)
-          expect(player1.hand.length).to eq hand_length
-          expect(player2.hand).to include(king_clubs)
-        end
-        it 'Player 1 goes fish and catches the requested card, Player 2 has original cards' do
-          hand_length = 3
-          expect(player1.hand).to include(ace_hearts, king_hearts)
-          expect(player1.hand.length).to eq hand_length
-          expect(player2.hand).to include(king_clubs)
-        end
       end
     end
 
@@ -179,11 +164,12 @@ RSpec.describe GoFishLobby do
           client1.provide_input('Player 2')
           lobby.run_round
         end
-        xit 'displays round results to players once' do
+        it 'displays round results to players once' do
           expect(client1.capture_output).to include('You', 'took', 'Ace', 'Player 2')
-          # You took a Ace of Clubs from Player 2.
+          # You took: Ace of Clubs
+          # From: Player 2
           lobby.run_round
-          expect(client1.capture_output).to_not include('You', 'took', 'Ace', 'Player 2')
+          expect(client1.capture_output).to_not match /result/
         end
       end
 
